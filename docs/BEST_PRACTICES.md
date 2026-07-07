@@ -24,6 +24,15 @@
 - Use particles/sounds to telegraph ecological effects.
 - Prefer non-combat value so new creatures are not just loot containers.
 
+## Creature Art, UI, And Animation
+
+- Keep placeholder/pipeline textures reproducible with committed scripts when possible.
+- Move to Blockbench/Aseprite sources when a creature is ready for production art.
+- Add animation states from real gameplay events, not only idle loops.
+- Use `SynchedEntityData` for entity animation state that clients must render reliably.
+- Keep client-only screens, models, and renderers under `client`.
+- Add a small localized field-guide or bestiary entry when a creature has non-obvious ecology.
+
 ## Worldgen And Ruins
 
 - Build ruins as data packs first: configured structures, template pools, processors, and biome tags.
@@ -37,7 +46,9 @@
 - JSON validation for resources.
 - `./gradlew runClient`
 - Creative inventory contains expected spawn eggs/items.
+- Field guide or bestiary UI opens when present.
 - Entity spawns with `/summon wildterrain:<id>`.
 - Entity can be spawned with its egg.
+- Gameplay-triggered animation states are visible.
 - Integrated server handshake includes `wildterrain`.
 - No missing texture or missing lang key is visible during basic play.

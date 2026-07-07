@@ -16,8 +16,11 @@ public final class ModCreativeTabs {
             () -> CreativeModeTab.builder()
                     .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
                     .title(Component.translatable("itemGroup.wildterrain"))
-                    .icon(() -> ModItems.MOSSQUILL_SPAWN_EGG.get().getDefaultInstance())
-                    .displayItems((parameters, output) -> output.accept(ModItems.MOSSQUILL_SPAWN_EGG.get()))
+                    .icon(() -> ModItems.MOSSQUILL_FIELD_GUIDE.get().getDefaultInstance())
+                    .displayItems((parameters, output) -> {
+                        output.accept(ModItems.MOSSQUILL_FIELD_GUIDE.get());
+                        output.accept(ModItems.MOSSQUILL_SPAWN_EGG.get());
+                    })
                     .build());
 
     private ModCreativeTabs() {

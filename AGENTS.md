@@ -41,6 +41,7 @@ Before claiming success, run at least `./gradlew build`. For gameplay changes, l
 - Client-only model/render code: `src/main/java/dev/lukez/wildterrain/client`
 - Runtime assets: `src/main/resources/assets/wildterrain`
 - World/data content: `src/main/resources/data/wildterrain`
+- Reproducible art scripts: `tools/`
 - Design docs: `docs/`
 
 ## Add A Creature
@@ -51,8 +52,18 @@ Before claiming success, run at least `./gradlew build`. For gameplay changes, l
 4. Add the spawn egg in `ModItems` and creative tab output in `ModCreativeTabs`.
 5. Add client model/renderer under `client`.
 6. Add lang keys, item model, texture, loot table, and biome modifier data.
-7. Document the creature in `README.md`, `docs/CREATURE_DESIGNS.md`, and `docs/PROGRESS.md`.
-8. Build and launch-test.
+7. Add a field-guide/bestiary UI entry when the creature has non-obvious ecology.
+8. Document the creature in `README.md`, `docs/CREATURE_DESIGNS.md`, and `docs/PROGRESS.md`.
+9. Build and launch-test.
+
+## Polish A Creature
+
+1. Read `docs/CREATURE_PIPELINE.md`.
+2. Regenerate or replace source-controlled art assets intentionally.
+3. Trigger animation states from gameplay events with synced entity data.
+4. Keep client UI and render classes under `client`.
+5. Add or update both `en_us.json` and `zh_cn.json`.
+6. Test the creature, its guide UI, and its spawn egg in `./gradlew runClient`.
 
 ## Agent Rules
 

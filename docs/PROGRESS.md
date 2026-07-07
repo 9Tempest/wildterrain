@@ -1,5 +1,24 @@
 # Progress
 
+## 2026-07-07
+
+Completed:
+
+- Added a reproducible Mossquill asset generator at `tools/generate_mossquill_assets.py`.
+- Regenerated the Mossquill entity texture as a 64x64 PNG and added a 16x16 Mossquill Field Guide item icon.
+- Added `wildterrain:mossquill_field_guide`, creative tab integration, item model, tooltip, and dual-language localization.
+- Added `MossquillGuideScreen`, a custom in-game field-guide UI for habitat, behavior, ecology, and animation tells.
+- Expanded Mossquill with synced animation states for grazing/mossing, glow-berry delight, and random sniffing.
+- Refined the Java model with separate ears, muzzle, moss blanket, tail tuft, paws, and animated quill rows.
+- Documented the repeatable creature art/UI/animation workflow in `docs/CREATURE_PIPELINE.md`.
+
+Known gaps:
+
+- Mossquill art is improved pipeline art, but still not final Blockbench/Aseprite production art.
+- UI is currently one creature entry; a shared bestiary index will be useful once there are multiple implemented creatures.
+- Natural spawning still needs longer in-world validation.
+- No dedicated automated GameTests yet.
+
 ## 2026-07-06
 
 Completed:
@@ -15,6 +34,7 @@ Completed:
 - Added README creature roster, agent handoff docs, best-practice docs, progress tracking, GitHub workflow, PR template, and issue templates.
 - Committed local baseline as `11f8373`.
 - Configured local `origin` as `https://github.com/9Tempest/wildterrain.git`.
+- Created and pushed the public GitHub repository at `https://github.com/9Tempest/wildterrain`.
 
 Known gaps:
 
@@ -22,7 +42,6 @@ Known gaps:
 - Natural spawning needs longer in-world validation.
 - No dedicated automated GameTests yet.
 - Citadel is optional metadata only; there is no Citadel API usage yet.
-- GitHub remote creation/push is blocked until `gh auth login` refreshes credentials for `9Tempest`.
 
 Next:
 

@@ -7,18 +7,20 @@ Wild Terrain creatures should feel like small ecological systems, not isolated c
 ### Mossquill / 苔针兽
 
 - Status: playable
-- Files: `Mossquill.java`, `MossquillModel.java`, `MossquillRenderer.java`, `mossquill.png`
+- Files: `Mossquill.java`, `MossquillModel.java`, `MossquillRenderer.java`, `MossquillGuideScreen.java`, `mossquill.png`
 - Habitat: lush caves, swamps, mangrove swamps, jungles
 - Role: ruin-grazer and gentle restoration creature
 - Food: moss block, moss carpet
 - Tempt item: glow berries
 - Player interaction: feeding glow berries grants short regeneration and haste
 - Ecology loop: slowly turns cobblestone, stone bricks, and cracked stone bricks into mossy variants when mob griefing is enabled
+- Field guide: `wildterrain:mossquill_field_guide`
+- Animation states: grazing/mossing, glow-berry delight, random sniffing, idle breathing, walking, ear flicks, tail motion
 - Visual attachment: `src/main/resources/assets/wildterrain/textures/entity/mossquill.png`
 
 Design notes:
 
-Mossquill is the proof creature. It validates registries, attributes, spawn rules, biome modifier data, creative tab integration, renderer/model registration, loot tables, localization, and real-client launch testing. Future creatures should use it as the simplest reference, then exceed it in behavior richness.
+Mossquill is the proof creature. It validates registries, attributes, spawn rules, biome modifier data, creative tab integration, renderer/model registration, loot tables, localization, player-facing field-guide UI, gameplay-triggered animation state, reproducible pixel assets, and real-client launch testing. Future creatures should use it as the simplest reference, then exceed it in behavior richness.
 
 ## Designed Next
 

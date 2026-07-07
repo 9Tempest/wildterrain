@@ -8,7 +8,13 @@ Mossquills are peaceful ruin-grazers. They can be bred with moss blocks or moss 
 
 ![Mossquill texture design](src/main/resources/assets/wildterrain/textures/entity/mossquill.png)
 
-The attached texture is intentionally simple and first-pass: it proves the renderer/model pipeline works while leaving room for proper Blockbench art later.
+The attached texture is generated from `tools/generate_mossquill_assets.py`, which also creates the Mossquill Field Guide icon. This keeps the current pixel-art assets reproducible until the creature graduates to hand-authored Blockbench/Aseprite production art.
+
+The current polish slice adds:
+
+- A refined Java model with separate ears, muzzle, moss blanket, tail tuft, paws, and animated quill rows.
+- Synced animation states for grazing/mossing, glow-berry delight, random sniffing, idle breathing, walking, ear flicks, and tail motion.
+- A Mossquill Field Guide item with a custom in-game UI that documents habitat, behavior, ecology, and animation tells.
 
 ## Creature Designs
 
@@ -31,6 +37,7 @@ Full creature briefs live in [docs/CREATURE_DESIGNS.md](docs/CREATURE_DESIGNS.md
 - `./gradlew runServer` launches a dedicated test server.
 - `./gradlew build` creates the reobfuscated mod jar in `build/libs`.
 - `./gradlew installClientMod` builds and copies the jar into `~/Library/Application Support/minecraft/mods`.
+- `python3 tools/generate_mossquill_assets.py` regenerates the current Mossquill pixel textures.
 
 Minecraft Java mods cannot load in a truly vanilla client; this project targets your local Forge 1.20.1 install so the final jar can be tested in real Minecraft. Citadel is listed as an optional compatibility dependency because Alex's Mobs and Alex's Caves use it, but this first creature has no hard runtime library dependency beyond Forge.
 
@@ -40,3 +47,4 @@ Minecraft Java mods cannot load in a truly vanilla client; this project targets 
 - Add terrain and ecology placement with data-driven biome modifiers under `src/main/resources/data/wildterrain`.
 - Add ruin structures through worldgen JSON/template pools as the next slice.
 - Start each agent task by reading [AGENTS.md](AGENTS.md), [docs/BEST_PRACTICES.md](docs/BEST_PRACTICES.md), and [docs/PROGRESS.md](docs/PROGRESS.md).
+- Follow the repeatable creature workflow in [docs/CREATURE_PIPELINE.md](docs/CREATURE_PIPELINE.md).

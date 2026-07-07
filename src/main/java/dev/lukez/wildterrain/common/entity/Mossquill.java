@@ -3,11 +3,15 @@ package dev.lukez.wildterrain.common.entity;
 import dev.lukez.wildterrain.core.ModEntities;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -39,6 +43,19 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 
 public class Mossquill extends Animal {
+    public static final int ANIMATION_NONE = 0;
+    public static final int ANIMATION_GRAZE = 1;
+    public static final int ANIMATION_DELIGHT = 2;
+    public static final int ANIMATION_SNIFF = 3;
+
+    private static final int GRAZE_TICKS = 54;
+    private static final int DELIGHT_TICKS = 46;
+    private static final int SNIFF_TICKS = 34;
+    private static final EntityDataAccessor<Integer> DATA_ANIMATION =
+            SynchedEntityData.defineId(Mossquill.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_ANIMATION_TICKS =
+            SynchedEntityData.defineId(Mossquill.class, EntityDataSerializers.INT);
+
     public Mossquill(EntityType<? extends Mossquill> entityType, Level level) {
         super(entityType, level);
     }
@@ -49,6 +66,13 @@ public class Mossquill extends Animal {
                 .add(Attributes.MOVEMENT_SPEED, 0.22D)
                 .add(Attributes.FOLLOW_RANGE, 18.0D)
                 .add(Attributes.ARMOR, 2.0D);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(DATA_ANIMATION, ANIMATION_NONE);
+        entityData.define(DATA_ANIMATION_TICKS, 0);
     }
 
     public static boolean checkMossquillSpawnRules(EntityType<Mossquill> type, ServerLevelAccessor level,
@@ -79,6 +103,10 @@ public class Mossquill extends Animal {
     @Override
     public void aiStep() {
         super.aiStep();
+        if (!level().isClientSide) {
+            tickAnimationState();
+            maybeStartIdleSniff();
+        }
         tryMossOldStone();
     }
 
@@ -92,6 +120,7 @@ public class Mossquill extends Animal {
                 if (!player.getAbilities().instabuild) {
                     held.shrink(1);
                 }
+                startAnimation(ANIMATION_DELIGHT, DELIGHT_TICKS);
                 level().broadcastEntityEvent(this, (byte) 18);
             }
             return InteractionResult.sidedSuccess(level().isClientSide);
@@ -109,6 +138,20 @@ public class Mossquill extends Animal {
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob mate) {
         return ModEntities.MOSSQUILL.get().create(level);
+    }
+
+    @Override
+    public void handleEntityEvent(byte id) {
+        if (id == 18) {
+            startAnimation(ANIMATION_DELIGHT, DELIGHT_TICKS);
+            for (int i = 0; i < 8; i++) {
+                level().addParticle(ParticleTypes.HAPPY_VILLAGER,
+                        getRandomX(0.7D), getY(0.65D + getRandom().nextDouble() * 0.35D), getRandomZ(0.7D),
+                        0.0D, 0.035D, 0.0D);
+            }
+            return;
+        }
+        super.handleEntityEvent(id);
     }
 
     @Nullable
@@ -144,6 +187,7 @@ public class Mossquill extends Animal {
         }
 
         if (serverLevel.setBlock(below, replacement, 3)) {
+            startAnimation(ANIMATION_GRAZE, GRAZE_TICKS);
             serverLevel.gameEvent(GameEvent.BLOCK_CHANGE, below, GameEvent.Context.of(this, replacement));
             serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                     getX(), getY(0.65D), getZ(),
@@ -160,5 +204,63 @@ public class Mossquill extends Animal {
             return Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
         }
         return null;
+    }
+
+    public int getAnimationState() {
+        return entityData.get(DATA_ANIMATION);
+    }
+
+    public int getAnimationTicks() {
+        return entityData.get(DATA_ANIMATION_TICKS);
+    }
+
+    public float getAnimationIntensity(int animation, float partialTick) {
+        if (getAnimationState() != animation) {
+            return 0.0F;
+        }
+
+        int duration = animationDuration(animation);
+        float remaining = Mth.clamp(getAnimationTicks() - partialTick, 0.0F, duration);
+        float ramp = Math.min(remaining, duration - remaining);
+        return Mth.clamp(ramp / 6.0F, 0.0F, 1.0F);
+    }
+
+    private void startAnimation(int animation, int ticks) {
+        entityData.set(DATA_ANIMATION, animation);
+        entityData.set(DATA_ANIMATION_TICKS, ticks);
+    }
+
+    private void tickAnimationState() {
+        int ticks = getAnimationTicks();
+        if (ticks <= 0) {
+            if (getAnimationState() != ANIMATION_NONE) {
+                startAnimation(ANIMATION_NONE, 0);
+            }
+            return;
+        }
+
+        entityData.set(DATA_ANIMATION_TICKS, ticks - 1);
+        if (ticks == 1) {
+            entityData.set(DATA_ANIMATION, ANIMATION_NONE);
+        }
+    }
+
+    private void maybeStartIdleSniff() {
+        if (getAnimationState() == ANIMATION_NONE && getRandom().nextInt(260) == 0) {
+            startAnimation(ANIMATION_SNIFF, SNIFF_TICKS);
+        }
+    }
+
+    private static int animationDuration(int animation) {
+        if (animation == ANIMATION_GRAZE) {
+            return GRAZE_TICKS;
+        }
+        if (animation == ANIMATION_DELIGHT) {
+            return DELIGHT_TICKS;
+        }
+        if (animation == ANIMATION_SNIFF) {
+            return SNIFF_TICKS;
+        }
+        return 1;
     }
 }

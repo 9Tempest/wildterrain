@@ -1,5 +1,17 @@
 {
   "itemGroup.wildterrain": "荒野地貌",
   "entity.wildterrain.mossquill": "苔针兽",
-  "item.wildterrain.mossquill_spawn_egg": "苔针兽刷怪蛋"
+  "item.wildterrain.mossquill_spawn_egg": "苔针兽刷怪蛋",
+  "item.wildterrain.mossquill_field_guide": "苔针兽生态笔记",
+  "item.wildterrain.mossquill_field_guide.tooltip": "打开苔针兽的简明生态档案。",
+  "guide.wildterrain.mossquill.title": "苔针兽生态笔记",
+  "guide.wildterrain.mossquill.subtitle": "Mossquill · 温和的遗迹啃苔者",
+  "guide.wildterrain.label.habitat": "栖息地",
+  "guide.wildterrain.label.behavior": "行为",
+  "guide.wildterrain.label.ecology": "生态",
+  "guide.wildterrain.label.animation": "动画",
+  "guide.wildterrain.mossquill.habitat": "繁茂洞穴、沼泽、丛林和已经被苔藓覆盖的旧遗迹。",
+  "guide.wildterrain.mossquill.behavior": "以苔藓为食，会被发光浆果吸引，并回馈谨慎玩家短暂的恢复增益。",
+  "guide.wildterrain.mossquill.ecology": "当 mobGriefing 允许时，苔针兽会缓慢把旧石头恢复成苔石或苔石砖。",
+  "guide.wildterrain.mossquill.animation": "可观察呼吸般起伏的背刺、耳朵抖动、低头啃苔、嗅闻和浆果开心反馈。"
 }

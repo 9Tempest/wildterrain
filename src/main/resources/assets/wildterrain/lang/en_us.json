@@ -1,5 +1,17 @@
 {
   "itemGroup.wildterrain": "Wild Terrain",
   "entity.wildterrain.mossquill": "Mossquill",
-  "item.wildterrain.mossquill_spawn_egg": "Mossquill Spawn Egg"
+  "item.wildterrain.mossquill_spawn_egg": "Mossquill Spawn Egg",
+  "item.wildterrain.mossquill_field_guide": "Mossquill Field Guide",
+  "item.wildterrain.mossquill_field_guide.tooltip": "Opens a compact ecology dossier for the Mossquill.",
+  "guide.wildterrain.mossquill.title": "Mossquill Field Guide",
+  "guide.wildterrain.mossquill.subtitle": "苔针兽 · gentle ruin-grazer",
+  "guide.wildterrain.label.habitat": "Habitat",
+  "guide.wildterrain.label.behavior": "Behavior",
+  "guide.wildterrain.label.ecology": "Ecology",
+  "guide.wildterrain.label.animation": "Animation",
+  "guide.wildterrain.mossquill.habitat": "Lush caves, swamps, jungles, and overgrown ruins where moss has already taken hold.",
+  "guide.wildterrain.mossquill.behavior": "Feeds on moss, follows glow berries, and rewards careful players with brief restoration buffs.",
+  "guide.wildterrain.mossquill.ecology": "When mob griefing allows it, Mossquills slowly restore old stone into mossy cobblestone or mossy stone bricks.",
+  "guide.wildterrain.mossquill.animation": "Look for breathing quills, ear flicks, grazing bows, sniffing, and glow-berry delight."
 }

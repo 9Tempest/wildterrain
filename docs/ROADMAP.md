@@ -11,7 +11,8 @@ Status: complete.
 
 ## Milestone 1: Creature Depth
 
-- Improve Mossquill texture and animations.
+- Improve Mossquill texture and animations. Status: first polish pass complete.
+- Add a Mossquill field-guide UI. Status: complete for the single-creature slice.
 - Add one custom sound set.
 - Add one more creature with a stronger traversal or discovery mechanic.
 - Add basic GameTest coverage for entity registration and spawn egg availability.
