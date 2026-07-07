@@ -2,6 +2,7 @@ package dev.lukez.wildterrain.core;
 
 import dev.lukez.wildterrain.WildTerrain;
 import dev.lukez.wildterrain.common.entity.Mossquill;
+import dev.lukez.wildterrain.common.entity.Xingsing;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -14,6 +15,7 @@ public final class CommonModEvents {
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.MOSSQUILL.get(), Mossquill.createAttributes().build());
+        event.put(ModEntities.XINGSING.get(), Xingsing.createAttributes().build());
     }
 
     @SubscribeEvent
@@ -22,6 +24,11 @@ public final class CommonModEvents {
                 SpawnPlacements.Type.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Mossquill::checkMossquillSpawnRules,
+                SpawnPlacementRegisterEvent.Operation.REPLACE);
+        event.register(ModEntities.XINGSING.get(),
+                SpawnPlacements.Type.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Xingsing::checkXingsingSpawnRules,
                 SpawnPlacementRegisterEvent.Operation.REPLACE);
     }
 

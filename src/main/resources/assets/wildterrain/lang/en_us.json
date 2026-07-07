@@ -4,6 +4,10 @@
   "item.wildterrain.mossquill_spawn_egg": "Mossquill Spawn Egg",
   "item.wildterrain.mossquill_field_guide": "Mossquill Field Guide",
   "item.wildterrain.mossquill_field_guide.tooltip": "Opens a compact ecology dossier for the Mossquill.",
+  "entity.wildterrain.xingsing": "Xingsing",
+  "item.wildterrain.xingsing_spawn_egg": "Xingsing Spawn Egg",
+  "item.wildterrain.xingsing_field_guide": "Xingsing Field Guide",
+  "item.wildterrain.xingsing_field_guide.tooltip": "Opens a compact ecology dossier for the curious white-eared mimic.",
   "guide.wildterrain.mossquill.title": "Mossquill Field Guide",
   "guide.wildterrain.mossquill.subtitle": "苔针兽 · gentle ruin-grazer",
   "guide.wildterrain.label.habitat": "Habitat",
@@ -13,5 +17,11 @@
   "guide.wildterrain.mossquill.habitat": "Lush caves, swamps, jungles, and overgrown ruins where moss has already taken hold.",
   "guide.wildterrain.mossquill.behavior": "Feeds on moss, follows glow berries, and rewards careful players with brief restoration buffs.",
   "guide.wildterrain.mossquill.ecology": "When mob griefing allows it, Mossquills slowly restore old stone into mossy cobblestone or mossy stone bricks.",
-  "guide.wildterrain.mossquill.animation": "Look for breathing quills, ear flicks, grazing bows, sniffing, and glow-berry delight."
+  "guide.wildterrain.mossquill.animation": "Look for breathing quills, ear flicks, grazing bows, sniffing, and glow-berry delight.",
+  "guide.wildterrain.xingsing.title": "Xingsing Field Guide",
+  "guide.wildterrain.xingsing.subtitle": "狌狌 · curious white-eared mimic",
+  "guide.wildterrain.xingsing.habitat": "Jungle canopies, bamboo groves, and lush cave mouths below dense forest.",
+  "guide.wildterrain.xingsing.behavior": "Watches friendly players and sometimes copies jumps, sneaks, and sprints.",
+  "guide.wildterrain.xingsing.ecology": "Carries fruit and dropped trinkets through the canopy, spreading seeds and warning small groups about danger.",
+  "guide.wildterrain.xingsing.animation": "Perked ears mean attention, low crawl means cautious mimicry, tail flicks mean mischief, and high chirps mean danger."
 }

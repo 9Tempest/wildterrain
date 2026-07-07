@@ -4,6 +4,10 @@
   "item.wildterrain.mossquill_spawn_egg": "苔针兽刷怪蛋",
   "item.wildterrain.mossquill_field_guide": "苔针兽生态笔记",
   "item.wildterrain.mossquill_field_guide.tooltip": "打开苔针兽的简明生态档案。",
+  "entity.wildterrain.xingsing": "狌狌",
+  "item.wildterrain.xingsing_spawn_egg": "狌狌刷怪蛋",
+  "item.wildterrain.xingsing_field_guide": "狌狌生态笔记",
+  "item.wildterrain.xingsing_field_guide.tooltip": "打开白耳模仿者狌狌的简明生态档案。",
   "guide.wildterrain.mossquill.title": "苔针兽生态笔记",
   "guide.wildterrain.mossquill.subtitle": "Mossquill · 温和的遗迹啃苔者",
   "guide.wildterrain.label.habitat": "栖息地",
@@ -13,5 +17,11 @@
   "guide.wildterrain.mossquill.habitat": "繁茂洞穴、沼泽、丛林和已经被苔藓覆盖的旧遗迹。",
   "guide.wildterrain.mossquill.behavior": "以苔藓为食，会被发光浆果吸引，并回馈谨慎玩家短暂的恢复增益。",
   "guide.wildterrain.mossquill.ecology": "当 mobGriefing 允许时，苔针兽会缓慢把旧石头恢复成苔石或苔石砖。",
-  "guide.wildterrain.mossquill.animation": "可观察呼吸般起伏的背刺、耳朵抖动、低头啃苔、嗅闻和浆果开心反馈。"
+  "guide.wildterrain.mossquill.animation": "可观察呼吸般起伏的背刺、耳朵抖动、低头啃苔、嗅闻和浆果开心反馈。",
+  "guide.wildterrain.xingsing.title": "狌狌生态笔记",
+  "guide.wildterrain.xingsing.subtitle": "Xingsing · 好奇的白耳模仿者",
+  "guide.wildterrain.xingsing.habitat": "丛林树冠、竹林，以及密林下方的繁茂洞穴入口。",
+  "guide.wildterrain.xingsing.behavior": "会观察友好的玩家，有时模仿跳跃、潜行和奔跑。",
+  "guide.wildterrain.xingsing.ecology": "会在树冠间搬运果实和小物件，传播种子，并在危险接近时提醒同伴。",
+  "guide.wildterrain.xingsing.animation": "竖耳代表注意，伏行代表谨慎模仿，尾巴快速摆动代表调皮，高声短鸣代表危险。"
 }

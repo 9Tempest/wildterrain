@@ -20,6 +20,8 @@ public final class ModCreativeTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.MOSSQUILL_FIELD_GUIDE.get());
                         output.accept(ModItems.MOSSQUILL_SPAWN_EGG.get());
+                        output.accept(ModItems.XINGSING_FIELD_GUIDE.get());
+                        output.accept(ModItems.XINGSING_SPAWN_EGG.get());
                     })
                     .build());
 

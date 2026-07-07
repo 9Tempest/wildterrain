@@ -1,12 +1,15 @@
 package dev.lukez.wildterrain;
 
 import com.mojang.logging.LogUtils;
+import dev.lukez.wildterrain.common.config.WildTerrainConfig;
 import dev.lukez.wildterrain.core.ModCreativeTabs;
 import dev.lukez.wildterrain.core.ModEntities;
 import dev.lukez.wildterrain.core.ModItems;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ public final class WildTerrain {
         ModEntities.ENTITY_TYPES.register(modBus);
         ModItems.ITEMS.register(modBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modBus);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, WildTerrainConfig.SPEC);
 
         modBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
