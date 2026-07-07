@@ -2,7 +2,9 @@
 
 This folder trains and exports a small option-level policy for `wildterrain:xingsing`.
 Minecraft never imports Python; these tools only read local JSONL logs written under
-`run/wildterrain-ai/logs/xingsing` when recording is enabled.
+`<gameDir>/wildterrain-ai/logs/xingsing` when recording is enabled. For
+`./gradlew runClient` the game directory is usually `run/`; for the normal Launcher
+profile it is usually `.minecraft`.
 
 Quick flow:
 
@@ -17,6 +19,20 @@ PYTHONDONTWRITEBYTECODE=1 python3 tools/ml/xingsing/distill_teacher_policy.py \
 The current committed D0 policy was distilled from 60k synthetic teacher states
 and reached 99.23% held-out teacher-match accuracy. It is a bootstrap model, not
 a replacement for real playtest data.
+
+Collect real JSONL playtest logs inside Minecraft:
+
+```text
+/wt_ai xingsing mode teacher
+/wt_ai xingsing record start
+/wt_ai xingsing record status
+/wt_ai xingsing debug on
+/summon wildterrain:xingsing ~2 ~ ~2
+/wt_ai xingsing scenario fetch_item
+/wt_ai xingsing scenario hostile_warning
+/wt_ai xingsing label OBSERVE_PLAYER
+/wt_ai xingsing record stop
+```
 
 Behavior-clone real JSONL playtest logs once NumPy is installed:
 

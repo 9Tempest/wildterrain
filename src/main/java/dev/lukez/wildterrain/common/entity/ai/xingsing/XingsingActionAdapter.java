@@ -34,7 +34,9 @@ public final class XingsingActionAdapter {
             case RETURN_ITEM -> mob.hasCarriedItem();
             case MIRROR_JUMP -> mob.onGround() && obs.nearestPlayerJumpedRecently;
             case WARN_HOSTILE -> obs.nearestHostileUuid != null && mob.getWarningCooldown() <= 0;
-            case FLEE_TO_TREE -> obs.escapePathScore > 0.25F;
+            case FLEE_TO_TREE -> obs.escapePathScore > 0.25F && Xingsing.hasImmediateDanger(obs);
+            case CLIMB_TO_PERCH, KEEP_PLAY_DISTANCE, MIRROR_SPRINT, PLAY_CHASE ->
+                    !mob.isSettlingIn() || Xingsing.hasImmediateDanger(obs);
             case LEAD_TO_FRUIT -> false;
             default -> true;
         };

@@ -29,6 +29,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -37,6 +38,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -79,6 +81,8 @@ public class Xingsing extends Animal {
     private static final int WARN_TICKS = 54;
     private static final int PLAY_TICKS = 50;
     private static final int TRUST_DECAY_INTERVAL = 200;
+    private static final int SPAWN_SETTLE_TICKS = 100;
+    private static final double SPAWN_FAMILIAR_PLAYER_RANGE = 16.0D;
     private static final EntityDataAccessor<Integer> DATA_ANIMATION =
             SynchedEntityData.defineId(Xingsing.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_ANIMATION_TICKS =
@@ -138,6 +142,13 @@ public class Xingsing extends Animal {
                 || stack.is(Items.MELON_SLICE);
     }
 
+    public static boolean hasImmediateDanger(XingsingObservation observation) {
+        return observation.threatScore > 0.4F
+                || observation.fear > 0.65F
+                || observation.healthRatio < 0.35F
+                || observation.lavaNearby;
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
@@ -170,6 +181,28 @@ public class Xingsing extends Animal {
                 warningCooldown--;
             }
         }
+    }
+
+    @Nullable
+    @Override
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+                                        MobSpawnType spawnType, @Nullable SpawnGroupData spawnData,
+                                        @Nullable CompoundTag dataTag) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnData, dataTag);
+        if (spawnType == MobSpawnType.COMMAND || spawnType == MobSpawnType.SPAWN_EGG) {
+            trust = Math.max(trust, 0.52F);
+            fear = 0.0F;
+            mischief = Mth.clamp(mischief - 0.08F, 0.0F, 1.0F);
+            if (level instanceof ServerLevel serverLevel) {
+                Player player = serverLevel.getNearestPlayer(this, SPAWN_FAMILIAR_PLAYER_RANGE);
+                if (player != null) {
+                    favoritePlayer = player.getUUID();
+                }
+            }
+            setCurrentOption(XingsingOption.OBSERVE_PLAYER);
+            startAnimation(ANIMATION_OBSERVE, OBSERVE_TICKS);
+        }
+        return data;
     }
 
     @Override
@@ -426,6 +459,10 @@ public class Xingsing extends Animal {
                 ? 999999 : (int) Math.max(0L, level().getGameTime() - lastHurtByPlayerTick);
     }
 
+    public boolean isSettlingIn() {
+        return tickCount < SPAWN_SETTLE_TICKS && getTicksSinceHurtByPlayer() > SPAWN_SETTLE_TICKS;
+    }
+
     private void tickPolicy() {
         optionElapsedTicks++;
         if (WildTerrainConfig.xingsingAiMode() == WildTerrainConfig.XingsingAiMode.DISABLED) {
@@ -445,6 +482,9 @@ public class Xingsing extends Animal {
 
     private XingsingOption selectPolicyAction(XingsingObservation observation, boolean[] mask,
                                               XingsingOption teacherAction) {
+        if (isSettlingIn() && !hasImmediateDanger(observation)) {
+            return teacherAction;
+        }
         if (WildTerrainConfig.xingsingAiMode() != WildTerrainConfig.XingsingAiMode.MODEL
                 || !WildTerrainConfig.xingsingAllowModelInference()) {
             return teacherAction;

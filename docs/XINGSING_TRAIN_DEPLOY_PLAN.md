@@ -88,7 +88,10 @@ effectively impossible before selection.
 /wt_ai xingsing scenario hostile_warning
 /wt_ai xingsing scenario trust_recovery
 /wt_ai xingsing scenario jungle_pathing
+/wt_ai xingsing mode teacher
+/wt_ai xingsing mode model
 /wt_ai xingsing record start
+/wt_ai xingsing record status
 /wt_ai xingsing record stop
 /wt_ai xingsing label <option>
 /wt_ai xingsing debug on|off
@@ -97,10 +100,39 @@ effectively impossible before selection.
 Logs are written to:
 
 ```text
-run/wildterrain-ai/logs/xingsing/YYYY-MM-DD/session-<timestamp>.jsonl
+<active Minecraft gameDir>/wildterrain-ai/logs/xingsing/YYYY-MM-DD/session-<timestamp>.jsonl
 ```
 
+In `./gradlew runClient`, `<active Minecraft gameDir>` is usually `run/`.
+In the normal Launcher profile, it is usually the `.minecraft` directory.
+
 Do not commit raw logs, replay files, or generated training checkpoints.
+
+## Manual Real-MC Collection Pass
+
+Use this when collecting real data without Computer Use:
+
+```text
+/wt_ai xingsing mode teacher
+/wt_ai xingsing record start
+/wt_ai xingsing record status
+/wt_ai xingsing debug on
+/summon wildterrain:xingsing ~2 ~ ~2
+```
+
+Then run a few short clips:
+
+- Stand still near a fresh Xingsing; it should settle, look, or approach instead of immediately fleeing.
+- Jump, sneak, and sprint near it.
+- Use `/wt_ai xingsing scenario fetch_item`, then watch the fetch/return loop.
+- Use `/wt_ai xingsing scenario hostile_warning`, then watch warning and evasive behavior.
+- Feed sweet berries, glow berries, cocoa beans, or melon slices after a fear/trust test.
+- If behavior is wrong, run `/wt_ai xingsing label <EXPECTED_OPTION>` close to the mistake.
+- Finish with `/wt_ai xingsing record stop`.
+
+For the first real dataset, prefer collecting broad teacher-supervised behavior
+with `/wt_ai xingsing mode teacher`. The training loader uses `teacher_action` by
+default, while also logging `policy_action` so later agents can compare model drift.
 
 ## Training Flow
 

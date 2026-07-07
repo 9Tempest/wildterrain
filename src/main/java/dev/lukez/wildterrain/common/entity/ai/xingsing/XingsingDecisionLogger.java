@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,16 +29,35 @@ public final class XingsingDecisionLogger {
     private static BufferedWriter writer;
     @Nullable
     private static String sessionId;
+    @Nullable
+    private static Path sessionPath;
 
     private XingsingDecisionLogger() {
     }
 
     public static void setRecordingOverride(@Nullable Boolean enabled) {
         recordingOverride = enabled;
+        if (Boolean.FALSE.equals(enabled)) {
+            closeWriter();
+        }
     }
 
     public static boolean isRecording() {
         return recordingOverride != null ? recordingOverride : WildTerrainConfig.xingsingRecordTrainingData();
+    }
+
+    public static Optional<Path> openRecordingSession() {
+        try {
+            ensureWriter();
+            return Optional.ofNullable(sessionPath);
+        } catch (IOException ex) {
+            WildTerrain.LOGGER.warn("Failed to open Xingsing decision log", ex);
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Path> currentSessionPath() {
+        return Optional.ofNullable(sessionPath);
     }
 
     public static void logDecision(Xingsing mob, XingsingObservation obs, boolean[] mask,
@@ -84,7 +104,22 @@ public final class XingsingDecisionLogger {
         sessionId = "session-" + System.currentTimeMillis();
         Path dir = FMLPaths.GAMEDIR.get().resolve("wildterrain-ai/logs/xingsing").resolve(day);
         Files.createDirectories(dir);
-        writer = Files.newBufferedWriter(dir.resolve(sessionId + ".jsonl"), StandardCharsets.UTF_8);
+        sessionPath = dir.resolve(sessionId + ".jsonl");
+        writer = Files.newBufferedWriter(sessionPath, StandardCharsets.UTF_8);
+    }
+
+    private static void closeWriter() {
+        if (writer == null) {
+            return;
+        }
+        try {
+            writer.close();
+        } catch (IOException ex) {
+            WildTerrain.LOGGER.warn("Failed to close Xingsing decision log", ex);
+        } finally {
+            writer = null;
+            sessionId = null;
+        }
     }
 
     private static String recordJson(Xingsing mob, XingsingObservation obs, boolean[] mask,

@@ -2,6 +2,7 @@ package dev.lukez.wildterrain.common.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.lukez.wildterrain.WildTerrain;
+import dev.lukez.wildterrain.common.config.WildTerrainConfig;
 import dev.lukez.wildterrain.common.entity.Xingsing;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.PlayerActionMemory;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.XingsingDecisionLogger;
@@ -45,10 +46,18 @@ public final class WildTerrainAiCommand {
                 .then(Commands.literal("xingsing")
                         .then(Commands.literal("record")
                                 .then(Commands.literal("start").executes(ctx -> setRecording(ctx.getSource(), true)))
-                                .then(Commands.literal("stop").executes(ctx -> setRecording(ctx.getSource(), false))))
+                                .then(Commands.literal("stop").executes(ctx -> setRecording(ctx.getSource(), false)))
+                                .then(Commands.literal("status").executes(ctx -> recordingStatus(ctx.getSource()))))
                         .then(Commands.literal("debug")
                                 .then(Commands.literal("on").executes(ctx -> setDebug(ctx.getSource(), true)))
                                 .then(Commands.literal("off").executes(ctx -> setDebug(ctx.getSource(), false))))
+                        .then(Commands.literal("mode")
+                                .then(Commands.argument("mode", StringArgumentType.word())
+                                        .suggests((context, builder) -> SharedSuggestionProvider.suggest(new String[]{
+                                                "teacher", "model", "disabled"
+                                        }, builder))
+                                        .executes(ctx -> setMode(ctx.getSource(),
+                                                StringArgumentType.getString(ctx, "mode")))))
                         .then(Commands.literal("label")
                                 .then(Commands.argument("option", StringArgumentType.word())
                                         .suggests((context, builder) -> SharedSuggestionProvider.suggest(
@@ -71,9 +80,28 @@ public final class WildTerrainAiCommand {
     }
 
     private static int setRecording(CommandSourceStack source, boolean enabled) {
+        String path = XingsingDecisionLogger.currentSessionPath()
+                .map(java.nio.file.Path::toString)
+                .orElse("(no session file yet)");
         XingsingDecisionLogger.setRecordingOverride(enabled);
+        if (enabled) {
+            path = XingsingDecisionLogger.openRecordingSession()
+                    .map(java.nio.file.Path::toString)
+                    .orElse("(failed to open session file; check latest.log)");
+        }
+        String finalPath = path;
         source.sendSuccess(() -> Component.literal("Xingsing recording " + (enabled ? "enabled" : "disabled")
-                + ". Logs stay local under run/wildterrain-ai/logs/xingsing."), true);
+                + ". Session: " + finalPath), true);
+        return 1;
+    }
+
+    private static int recordingStatus(CommandSourceStack source) {
+        String path = XingsingDecisionLogger.currentSessionPath()
+                .map(java.nio.file.Path::toString)
+                .orElse("(no active session file)");
+        source.sendSuccess(() -> Component.literal("Xingsing recording "
+                + (XingsingDecisionLogger.isRecording() ? "enabled" : "disabled")
+                + ". Session: " + path), false);
         return 1;
     }
 
@@ -83,6 +111,20 @@ public final class WildTerrainAiCommand {
             DEBUG_PLAYERS.put(player.getUUID(), enabled);
         }
         source.sendSuccess(() -> Component.literal("Xingsing debug " + (enabled ? "enabled" : "disabled") + "."), false);
+        return 1;
+    }
+
+    private static int setMode(CommandSourceStack source, String rawMode) {
+        if (!WildTerrainConfig.setXingsingAiMode(rawMode)) {
+            source.sendFailure(Component.literal("Unknown Xingsing AI mode: " + rawMode
+                    + ". Use teacher, model, or disabled."));
+            return 0;
+        }
+        WildTerrainConfig.setXingsingAllowModelInference(
+                WildTerrainConfig.xingsingAiMode() == WildTerrainConfig.XingsingAiMode.MODEL);
+        source.sendSuccess(() -> Component.literal("Xingsing AI mode set to "
+                + WildTerrainConfig.xingsingAiMode().name().toLowerCase(java.util.Locale.ROOT)
+                + " for this session."), true);
         return 1;
     }
 

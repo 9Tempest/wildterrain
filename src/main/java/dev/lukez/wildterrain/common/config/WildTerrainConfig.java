@@ -56,6 +56,16 @@ public final class WildTerrainConfig {
         }
     }
 
+    public static boolean setXingsingAiMode(String value) {
+        try {
+            XingsingAiMode mode = XingsingAiMode.valueOf(value.trim().toUpperCase(Locale.ROOT));
+            XINGSING_AI_MODE.set(mode.name().toLowerCase(Locale.ROOT));
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
+
     public static boolean xingsingRecordTrainingData() {
         return XINGSING_RECORD_TRAINING_DATA.get();
     }
@@ -82,6 +92,10 @@ public final class WildTerrainConfig {
 
     public static boolean xingsingAllowModelInference() {
         return XINGSING_ALLOW_MODEL_INFERENCE.get();
+    }
+
+    public static void setXingsingAllowModelInference(boolean enabled) {
+        XINGSING_ALLOW_MODEL_INFERENCE.set(enabled);
     }
 
     public enum XingsingAiMode {

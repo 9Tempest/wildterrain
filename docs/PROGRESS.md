@@ -12,6 +12,8 @@ Completed:
 - Added `docs/XINGSING_TRAIN_DEPLOY_PLAN.md` for future AI agents and model rollout gates.
 - Trained and exported the first D0 Xingsing model policy from 60k synthetic teacher states, with 99.23% held-out teacher-match accuracy.
 - Switched Xingsing to model-first inference by default while preserving action masks and teacher fallback.
+- Added spawn-settle safety so freshly summoned Xingsing observes nearby players before playful/perch/flee movement unless there is immediate danger.
+- Improved `/wt_ai xingsing record` with status/path reporting for manual real-MC data collection.
 - Added a reproducible Mossquill asset generator at `tools/generate_mossquill_assets.py`.
 - Regenerated the Mossquill entity texture as a 64x64 PNG and added a 16x16 Mossquill Field Guide item icon.
 - Added `wildterrain:mossquill_field_guide`, creative tab integration, item model, tooltip, and dual-language localization.
