@@ -12,6 +12,9 @@ Completed:
 - Built the jar successfully with `./gradlew build`.
 - Installed `wildterrain-0.1.0.jar` into the local Minecraft mods folder.
 - Launched `./gradlew runClient`, loaded a local world, and confirmed the mod list includes `wildterrain`.
+- Added README creature roster, agent handoff docs, best-practice docs, progress tracking, GitHub workflow, PR template, and issue templates.
+- Committed local baseline as `11f8373`.
+- Configured local `origin` as `https://github.com/9Tempest/wildterrain.git`.
 
 Known gaps:
 
@@ -19,10 +22,11 @@ Known gaps:
 - Natural spawning needs longer in-world validation.
 - No dedicated automated GameTests yet.
 - Citadel is optional metadata only; there is no Citadel API usage yet.
+- GitHub remote creation/push is blocked until `gh auth login` refreshes credentials for `9Tempest`.
 
 Next:
 
 - Add a simple GameTest or command-driven validation for entity registration.
 - Implement Lanternback Nacrelisk or Silt Skater as the second creature.
 - Add the first ruin structure and link it to creature behavior.
-- Add GitHub remote under `9Tempest` once authentication is refreshed.
+- Run the commands in `docs/GITHUB_SETUP.md` once GitHub authentication is refreshed.
