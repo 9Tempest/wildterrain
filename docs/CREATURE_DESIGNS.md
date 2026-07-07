@@ -22,6 +22,25 @@ Design notes:
 
 Mossquill is the proof creature. It validates registries, attributes, spawn rules, biome modifier data, creative tab integration, renderer/model registration, loot tables, localization, player-facing field-guide UI, gameplay-triggered animation state, reproducible pixel assets, and real-client launch testing. Future creatures should use it as the simplest reference, then exceed it in behavior richness.
 
+### Xingsing / 狌狌
+
+- Status: playable AI-ready prototype
+- Files: `Xingsing.java`, `XingsingModel.java`, `XingsingRenderer.java`, `XingsingGuideScreen.java`, `common/entity/ai/xingsing`, `tools/ml/xingsing`
+- Habitat: jungle canopies, bamboo groves, and lush cave mouths below dense forest
+- Role: friendly white-eared mimic companion
+- Food: sweet berries, glow berries, cocoa beans, melon slices
+- Player interaction: may mimic jumps, sneaks, and sprints; may fetch recently player-dropped items and return them
+- Ecology loop: warns about nearby hostile mobs and uses canopy/perch geometry as escape behavior
+- Social memory: trust, fear, and mischief persist to NBT and shift after feeding or attacks
+- Field guide: `wildterrain:xingsing_field_guide`
+- Animation states: observe, mimic jump, mimic sneak, fetch, return item, warn, play
+- AI workflow: option teacher, 110-feature observation vector, action masks, local JSONL logging, NumPy behavior-cloning/export tools, Java MLP loader
+- Visual attachment: `src/main/resources/assets/wildterrain/textures/entity/xingsing.png`
+
+Design notes:
+
+Xingsing is the first creature built around a trainable option policy. The shipped behavior is rule-teacher-first so the creature remains fun and safe without a model. Future model rollouts must preserve the adapter safety layer: only fetch recent player drops, return carried items to the owner, rate-limit warnings, and fall back to teacher behavior if a policy is missing or invalid.
+
 ## Designed Next
 
 ### Lanternback Nacrelisk / 灯背珠蜥

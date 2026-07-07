@@ -9,7 +9,7 @@ This repository is meant to be friendly to future AI agents. Read this file befo
 - Loader: Forge
 - Minecraft: `1.20.1`
 - Java bytecode/toolchain: Java 17
-- Current playable creature: `Mossquill`
+- Current playable creatures: `Mossquill`, `Xingsing`
 - GitHub owner target: `9Tempest`
 
 Wild Terrain should learn from the design density of Alex's Mobs and Alex's Caves without copying code, assets, text, names, or exact mechanics. Prefer original ecology loops, data-driven placement, and small systems that interact with vanilla Minecraft.
@@ -42,6 +42,7 @@ Before claiming success, run at least `./gradlew build`. For gameplay changes, l
 - Runtime assets: `src/main/resources/assets/wildterrain`
 - World/data content: `src/main/resources/data/wildterrain`
 - Reproducible art scripts: `tools/`
+- Offline AI/policy tools: `tools/ml/xingsing/`
 - Design docs: `docs/`
 
 ## Add A Creature
@@ -64,6 +65,15 @@ Before claiming success, run at least `./gradlew build`. For gameplay changes, l
 4. Keep client UI and render classes under `client`.
 5. Add or update both `en_us.json` and `zh_cn.json`.
 6. Test the creature, its guide UI, and its spawn egg in `./gradlew runClient`.
+
+## Extend Xingsing AI
+
+1. Read `docs/XINGSING_TRAIN_DEPLOY_PLAN.md`.
+2. Keep Minecraft runtime code server-safe under `common/entity/ai/xingsing` or `common/entity/ai/policy`.
+3. Keep logging disabled by default; use `/wt_ai xingsing record start` only for local opt-in playtests.
+4. Preserve action masks and `XingsingActionAdapter` safety checks when changing teacher or model behavior.
+5. Never commit `run/wildterrain-ai`, raw logs, replay files, or generated model checkpoints.
+6. Run `./gradlew build` and at least one real-client scenario before claiming AI behavior is ready.
 
 ## Agent Rules
 

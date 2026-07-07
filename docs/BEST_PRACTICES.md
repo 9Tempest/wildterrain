@@ -23,6 +23,10 @@
 - Avoid frequent block scans in `aiStep`; throttle with `tickCount` and randomness.
 - Use particles/sounds to telegraph ecological effects.
 - Prefer non-combat value so new creatures are not just loot containers.
+- For learned/social behavior, choose high-level options and execute them through a hand-written adapter. Vanilla pathing should handle movement; the policy should choose intent.
+- Treat action masks as runtime safety, not only training convenience.
+- Keep teacher fallback available until model policies pass real scenario gates.
+- Keep training logs local, opt-in, and privacy-safe.
 
 ## Creature Art, UI, And Animation
 

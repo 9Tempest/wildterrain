@@ -1,0 +1,7 @@
+# Reserved for a later memory-policy milestone. Keep v1 deployment on the MLP
+# until the teacher/model fallback and scenario gates are stable in real MC.
+hidden_size: 128
+epochs: 16
+batch_size: 64
+learning_rate: 0.001
+seed: 11

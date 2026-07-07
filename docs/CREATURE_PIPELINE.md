@@ -29,12 +29,15 @@ Current example:
 
 ```bash
 python3 tools/generate_mossquill_assets.py
+python3 tools/generate_xingsing_assets.py
 ```
 
 Outputs:
 
 - `src/main/resources/assets/wildterrain/textures/entity/mossquill.png`
 - `src/main/resources/assets/wildterrain/textures/item/mossquill_field_guide.png`
+- `src/main/resources/assets/wildterrain/textures/entity/xingsing.png`
+- `src/main/resources/assets/wildterrain/textures/item/xingsing_field_guide.png`
 
 For production art, replace or supplement this stage with Blockbench and Aseprite:
 
@@ -93,7 +96,30 @@ Current example:
 - Item: `wildterrain:mossquill_field_guide`
 - Screen: `MossquillGuideScreen`
 
-## 6. Verification
+## 6. AI And Policy Pass
+
+Use option-level policies for creatures with social or learned behavior. Do not train
+raw movement controls when vanilla navigation can safely execute a high-level option.
+
+Current example:
+
+- Entity: `wildterrain:xingsing`
+- Options: `XingsingOption`
+- Observation: `XingsingObservation` with spec version and fixed vector size
+- Teacher: `XingsingRuleTeacher`
+- Safety layer: `XingsingActionMaskBuilder` and `XingsingActionAdapter`
+- Local logs: `run/wildterrain-ai/logs/xingsing`
+- Offline tools: `tools/ml/xingsing`
+
+Rules:
+
+- Keep logging disabled by default and local-only.
+- Hash player UUIDs and never log usernames, chat, or raw world seeds.
+- Keep masks active for teacher and model inference.
+- Keep model inference behind config until real scenario gates pass.
+- Fall back to teacher behavior when a policy resource is absent, invalid, or disabled.
+
+## 7. Verification
 
 Before calling a creature slice complete:
 
@@ -110,3 +136,4 @@ In the dev client:
 - Spawn the creature with its egg and with `/summon wildterrain:<id>`.
 - Feed or trigger its interaction and watch the animation state.
 - Check logs for missing texture, missing lang, or registry errors.
+- For Xingsing, run `/wt_ai xingsing scenario fetch_item` and verify no item loss or duplication.

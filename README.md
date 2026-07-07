@@ -1,6 +1,6 @@
 # Wild Terrain
 
-Wild Terrain is a Forge 1.20.1 mod framework for exploration-first creatures, terrain, ecology, and ruins. The first playable slice adds the Mossquill, a moss-backed creature that fits lush caves, swamps, jungles, and overgrown ruins.
+Wild Terrain is a Forge 1.20.1 mod framework for exploration-first creatures, terrain, ecology, and ruins. The first playable slices add the Mossquill, a moss-backed ruin-grazer, and Xingsing, a friendly white-eared mimic companion.
 
 ## Playable Slice
 
@@ -16,6 +16,10 @@ The current polish slice adds:
 - Synced animation states for grazing/mossing, glow-berry delight, random sniffing, idle breathing, walking, ear flicks, and tail motion.
 - A Mossquill Field Guide item with a custom in-game UI that documents habitat, behavior, ecology, and animation tells.
 
+Xingsing is the first AI-ready companion slice. It watches nearby players, may mimic jumps/sneaks/sprints, fetches recently dropped player items, warns about hostile mobs, and remembers trust/fear/mischief. Its rule teacher is playable today, while logging and offline training tools prepare a later model rollout with masks and teacher fallback.
+
+![Xingsing texture design](src/main/resources/assets/wildterrain/textures/entity/xingsing.png)
+
 ## Creature Designs
 
 These designs are the north star for the mod: each creature should touch at least two systems, such as behavior plus ecology, worldgen plus ruins, or player utility plus risk.
@@ -23,6 +27,7 @@ These designs are the north star for the mod: each creature should touch at leas
 | Creature | Status | Habitat | Core Design |
 | --- | --- | --- | --- |
 | Mossquill / 苔针兽 | Implemented | Lush caves, swamps, jungles, overgrown ruins | Peaceful ruin-grazer that mosses old stone, breeds on moss, and trades glow berries for short restoration buffs. |
+| Xingsing / 狌狌 | Implemented | Jungle canopies, bamboo groves, lush cave mouths | Friendly white-eared mimic that copies simple player actions, fetches recent dropped items, warns about danger, and learns through a teacher/logging policy framework. |
 | Lanternback Nacrelisk / 灯背珠蜥 | Designed | Abyssal cave pools, dripstone aquifers | Slow amphibian with a living lantern shell. It scares small hostile mobs, attracts fish, and reveals nearby underwater ruin glyphs when fed prismarine shards. |
 | Silt Skater / 泥纹掠行者 | Designed | Mangrove swamps, river deltas, mud flats | Insectile surface-skimmer that rides water and mud. Its wake briefly firms mud into walkable silt paths, making swamp traversal a creature-driven mechanic. |
 | Basalt Bellwether / 玄武鸣羊 | Designed | Basalt deltas, volcanic caves | Herd animal with resonant horns. Herd calls expose hidden ore veins and unstable basalt bridges, but loud calls can also wake deeper predators. |
@@ -38,6 +43,9 @@ Full creature briefs live in [docs/CREATURE_DESIGNS.md](docs/CREATURE_DESIGNS.md
 - `./gradlew build` creates the reobfuscated mod jar in `build/libs`.
 - `./gradlew installClientMod` builds and copies the jar into `~/Library/Application Support/minecraft/mods`.
 - `python3 tools/generate_mossquill_assets.py` regenerates the current Mossquill pixel textures.
+- `python3 tools/generate_xingsing_assets.py` regenerates the current Xingsing pixel textures.
+- `/wt_ai xingsing scenario fetch_item` and related commands prepare real-client behavior scenarios.
+- `/wt_ai xingsing record start` writes local JSONL training logs under `run/wildterrain-ai`; recording is off by default.
 
 Minecraft Java mods cannot load in a truly vanilla client; this project targets your local Forge 1.20.1 install so the final jar can be tested in real Minecraft. Citadel is listed as an optional compatibility dependency because Alex's Mobs and Alex's Caves use it, but this first creature has no hard runtime library dependency beyond Forge.
 
