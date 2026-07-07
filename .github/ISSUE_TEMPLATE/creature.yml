@@ -1,0 +1,34 @@
+name: Creature Design
+description: Propose or refine a Wild Terrain creature.
+title: "[Creature] "
+labels:
+  - creature
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Creature name
+      description: Include English and Chinese names if available.
+    validations:
+      required: true
+  - type: textarea
+    id: habitat
+    attributes:
+      label: Habitat and spawn logic
+      description: Where does it live, and what conditions should gate spawning?
+    validations:
+      required: true
+  - type: textarea
+    id: interaction
+    attributes:
+      label: Player interaction
+      description: What does the player do with it besides fighting?
+    validations:
+      required: true
+  - type: textarea
+    id: ecology
+    attributes:
+      label: Ecology loop
+      description: How does it interact with blocks, mobs, weather, ruins, or terrain?
+    validations:
+      required: true
