@@ -63,6 +63,14 @@ public final class TinyMlpPolicy implements PolicyModel {
                 throw new IOException("Unsupported policy layer: " + type);
             }
         }
+        if (inferredInput != XingsingObservation.VECTOR_SIZE) {
+            throw new IOException("Xingsing policy input mismatch: expected "
+                    + XingsingObservation.VECTOR_SIZE + ", got " + inferredInput);
+        }
+        if (inferredOutput != XingsingOption.COUNT) {
+            throw new IOException("Xingsing policy output mismatch: expected "
+                    + XingsingOption.COUNT + ", got " + inferredOutput);
+        }
         return new TinyMlpPolicy(inferredInput, inferredOutput, layers);
     }
 

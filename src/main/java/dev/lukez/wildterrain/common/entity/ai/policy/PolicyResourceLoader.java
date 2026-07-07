@@ -19,8 +19,8 @@ public final class PolicyResourceLoader {
         if (resource.isEmpty()) {
             return Optional.empty();
         }
-        try {
-            return Optional.of(TinyMlpPolicy.fromJson(resource.get().open()));
+        try (var inputStream = resource.get().open()) {
+            return Optional.of(TinyMlpPolicy.fromJson(inputStream));
         } catch (IOException | RuntimeException ex) {
             WildTerrain.LOGGER.warn("Could not load Xingsing policy {}, falling back to teacher",
                     XINGSING_POLICY, ex);

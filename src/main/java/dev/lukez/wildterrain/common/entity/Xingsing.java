@@ -1,6 +1,8 @@
 package dev.lukez.wildterrain.common.entity;
 
 import dev.lukez.wildterrain.common.config.WildTerrainConfig;
+import dev.lukez.wildterrain.common.entity.ai.policy.PolicyResourceLoader;
+import dev.lukez.wildterrain.common.entity.ai.policy.TinyMlpPolicy;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.PlayerActionMemory;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.XingsingActionAdapter;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.XingsingActionMaskBuilder;
@@ -11,6 +13,8 @@ import dev.lukez.wildterrain.common.entity.ai.xingsing.XingsingOption;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.XingsingRuleTeacher;
 import dev.lukez.wildterrain.core.ModEntities;
 import java.util.UUID;
+import java.util.Optional;
+import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -19,6 +23,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
@@ -80,6 +85,10 @@ public class Xingsing extends Animal {
             SynchedEntityData.defineId(Xingsing.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_CURRENT_OPTION =
             SynchedEntityData.defineId(Xingsing.class, EntityDataSerializers.INT);
+    private static Optional<TinyMlpPolicy> cachedPolicy = Optional.empty();
+    @Nullable
+    private static MinecraftServer cachedPolicyServer;
+    private static boolean policyLoadAttempted;
 
     private final XingsingObservationBuilder observationBuilder = new XingsingObservationBuilder();
     private final XingsingActionMaskBuilder maskBuilder = new XingsingActionMaskBuilder();
@@ -427,11 +436,55 @@ public class Xingsing extends Animal {
             XingsingObservation observation = observationBuilder.build(this);
             boolean[] mask = maskBuilder.build(this, observation);
             XingsingOption teacherAction = teacher.select(observation, mask);
-            XingsingOption selected = teacherAction;
+            XingsingOption selected = selectPolicyAction(observation, mask, teacherAction);
             actionAdapter.start(this, observation, selected);
             XingsingDecisionLogger.logDecision(this, observation, mask, teacherAction, selected);
         }
         actionAdapter.tick(this);
+    }
+
+    private XingsingOption selectPolicyAction(XingsingObservation observation, boolean[] mask,
+                                              XingsingOption teacherAction) {
+        if (WildTerrainConfig.xingsingAiMode() != WildTerrainConfig.XingsingAiMode.MODEL
+                || !WildTerrainConfig.xingsingAllowModelInference()) {
+            return teacherAction;
+        }
+
+        TinyMlpPolicy policy = getPolicy();
+        if (policy == null) {
+            return teacherAction;
+        }
+
+        try {
+            XingsingOption selected = policy.select(observation.vector(), mask, new Random(getRandom().nextLong()));
+            if (mask[selected.id()] && actionAdapter.canStart(this, observation, selected)) {
+                return selected;
+            }
+        } catch (RuntimeException ex) {
+            dev.lukez.wildterrain.WildTerrain.LOGGER.warn(
+                    "Xingsing policy inference failed; falling back to teacher", ex);
+        }
+        return teacherAction;
+    }
+
+    @Nullable
+    private TinyMlpPolicy getPolicy() {
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return null;
+        }
+        MinecraftServer server = serverLevel.getServer();
+        if (!policyLoadAttempted || cachedPolicyServer != server) {
+            cachedPolicyServer = server;
+            cachedPolicy = PolicyResourceLoader.loadXingsingPolicy(server);
+            policyLoadAttempted = true;
+            cachedPolicy.ifPresentOrElse(
+                    policy -> dev.lukez.wildterrain.WildTerrain.LOGGER.info(
+                            "Loaded Xingsing model policy with {} inputs and {} outputs.",
+                            policy.inputSize(), policy.outputSize()),
+                    () -> dev.lukez.wildterrain.WildTerrain.LOGGER.info(
+                            "No Xingsing model policy loaded; teacher fallback remains active."));
+        }
+        return cachedPolicy.orElse(null);
     }
 
     private void tickAnimationState() {

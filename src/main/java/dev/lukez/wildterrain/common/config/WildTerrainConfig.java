@@ -19,7 +19,7 @@ public final class WildTerrainConfig {
         builder.push("xingsing");
         XINGSING_AI_MODE = builder
                 .comment("disabled, teacher, or model. Model mode always falls back to teacher when no safe policy is loaded.")
-                .define("aiMode", "teacher");
+                .define("aiMode", "model");
         XINGSING_RECORD_TRAINING_DATA = builder
                 .comment("Writes privacy-safe local JSONL decision records under run/wildterrain-ai when enabled.")
                 .define("recordTrainingData", false);
@@ -40,7 +40,7 @@ public final class WildTerrainConfig {
                 .define("allowFetchDeathDrops", false);
         XINGSING_ALLOW_MODEL_INFERENCE = builder
                 .comment("Extra safety gate for loading exported model weights in aiMode=model.")
-                .define("allowModelInference", false);
+                .define("allowModelInference", true);
         builder.pop();
         SPEC = builder.build();
     }

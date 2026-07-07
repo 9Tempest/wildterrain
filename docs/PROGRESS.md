@@ -10,6 +10,8 @@ Completed:
 - Added `/wt_ai xingsing` scenario, record, debug, and label commands for real-client data collection.
 - Added offline behavior-cloning tooling under `tools/ml/xingsing`, including dataset loading, NumPy MLP training, evaluation, Java-weight export, and export validation.
 - Added `docs/XINGSING_TRAIN_DEPLOY_PLAN.md` for future AI agents and model rollout gates.
+- Trained and exported the first D0 Xingsing model policy from 60k synthetic teacher states, with 99.23% held-out teacher-match accuracy.
+- Switched Xingsing to model-first inference by default while preserving action masks and teacher fallback.
 - Added a reproducible Mossquill asset generator at `tools/generate_mossquill_assets.py`.
 - Regenerated the Mossquill entity texture as a 64x64 PNG and added a 16x16 Mossquill Field Guide item icon.
 - Added `wildterrain:mossquill_field_guide`, creative tab integration, item model, tooltip, and dual-language localization.
@@ -20,7 +22,7 @@ Completed:
 
 Known gaps:
 
-- Xingsing has a teacher/playable policy, but no trained policy has been collected, trained, exported, or enabled yet.
+- Xingsing model is trained from synthetic teacher data only; real playtest logs and DAgger corrections are still needed before treating it as a learned player-experience policy.
 - Xingsing needs curated no-duplication/no-loss GameTests around carried items.
 - Mossquill art is improved pipeline art, but still not final Blockbench/Aseprite production art.
 - UI is currently one creature entry; a shared bestiary index will be useful once there are multiple implemented creatures.

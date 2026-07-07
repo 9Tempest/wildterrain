@@ -21,6 +21,10 @@ build
 # other
 eclipse
 run
+artifacts
+.venv
+__pycache__
+*.pyc
 
 # Files from Forge MDK
 forge*changelog.txt

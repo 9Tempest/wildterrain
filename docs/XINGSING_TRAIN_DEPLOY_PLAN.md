@@ -21,12 +21,18 @@ Implemented now:
 - Scenario/debug/label commands under `/wt_ai xingsing`
 - Offline NumPy training/export tools under `tools/ml/xingsing`
 - Java MLP loader and masked action selector for future model deployment
+- D0 distilled teacher policy exported at `data/wildterrain/policies/xingsing_policy_v1.json`
 
 Not enabled by default:
 
-- Model inference. `allowModelInference=false` and `aiMode=teacher` remain the safe defaults.
 - Raw log collection. Training logs are local-only and disabled unless explicitly enabled.
 - ONNX/GRU runtime. Keep this optional until packaging is proven across client and dedicated server.
+
+Enabled by default:
+
+- Model inference runs in `aiMode=model` with `allowModelInference=true`.
+- The model is still bounded by runtime action masks and `XingsingActionAdapter`.
+- If the policy resource is absent, invalid, or rejects the observation spec, Xingsing falls back to the teacher.
 
 ## Gameplay Contract
 
@@ -99,6 +105,9 @@ Do not commit raw logs, replay files, or generated training checkpoints.
 ## Training Flow
 
 ```bash
+PYTHONDONTWRITEBYTECODE=1 python3 tools/ml/xingsing/distill_teacher_policy.py \
+  --out src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json
+
 python3 -m venv .venv
 source .venv/bin/activate
 pip install numpy
@@ -114,14 +123,18 @@ python tools/ml/xingsing/evaluate_policy.py \
 
 python tools/ml/xingsing/export_java_weights.py \
   --model artifacts/policies/xingsing_bc_v1/model.npz \
-  --out src/main/resources/assets/wildterrain/policies/xingsing_policy_v1.json
+  --out src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json
 
 python tools/ml/xingsing/validate_export.py \
   --model artifacts/policies/xingsing_bc_v1/model.npz \
-  --policy-json src/main/resources/assets/wildterrain/policies/xingsing_policy_v1.json
+  --policy-json src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json
 ```
 
-Release gate before model inference becomes default:
+The committed D0 policy was distilled from 60k synthetic teacher states and reached
+99.23% held-out teacher-match accuracy. Before using real playtest behavior as the
+source of truth, replace or fine-tune this policy with recorded JSONL data.
+
+Release gate before model inference can be treated as production-learned behavior:
 
 - Item loss rate is zero in curated fetch/return tests.
 - Item duplication rate is zero.
