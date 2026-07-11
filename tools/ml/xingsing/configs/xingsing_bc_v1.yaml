@@ -1,5 +1,8 @@
 hidden_size: 128
-epochs: 12
+epochs: 80
 batch_size: 128
-learning_rate: 0.003
+learning_rate: 0.01
+class_weight_power: 0.0
+balanced_class_sampling: 1
+correction_window_ticks: 80
 seed: 7

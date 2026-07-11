@@ -21,7 +21,8 @@ Implemented now:
 - Scenario/debug/label commands under `/wt_ai xingsing`
 - Offline NumPy training/export tools under `tools/ml/xingsing`
 - Java MLP loader and masked action selector for future model deployment
-- D0 distilled teacher policy exported at `data/wildterrain/policies/xingsing_policy_v1.json`
+- Real-log behavior-cloned student policy exported at `data/wildterrain/policies/xingsing_policy_v1.json`
+- D0 synthetic teacher-distilled policy retained as a reproducible bootstrap path
 
 Not enabled by default:
 
@@ -155,16 +156,28 @@ python tools/ml/xingsing/evaluate_policy.py \
 
 python tools/ml/xingsing/export_java_weights.py \
   --model artifacts/policies/xingsing_bc_v1/model.npz \
-  --out src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json
+  --out src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json \
+  --policy-version xingsing_real_bc_YYYYMMDD_v1
 
 python tools/ml/xingsing/validate_export.py \
   --model artifacts/policies/xingsing_bc_v1/model.npz \
   --policy-json src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json
 ```
 
-The committed D0 policy was distilled from 60k synthetic teacher states and reached
-99.23% held-out teacher-match accuracy. Before using real playtest behavior as the
-source of truth, replace or fine-tune this policy with recorded JSONL data.
+The original D0 policy was distilled from 60k synthetic teacher states and reached
+99.23% held-out teacher-match accuracy. The current student policy,
+`xingsing_real_bc_20260710_v1`, was trained from 1,200 real Minecraft decision
+records and reached 90.2% teacher-match accuracy on that local training set.
+
+The 2026-07-10 dataset covered `IDLE_GROOM`, `OBSERVE_PLAYER`, mimic
+jump/sneak/sprint, item pickup/return, and `CLIMB_TO_PERCH`. It did not cover
+`APPROACH_PLAYER`, `KEEP_PLAY_DISTANCE`, `PLAY_CHASE`, `WARN_HOSTILE`,
+`FLEE_TO_TREE`, or `LEAD_TO_FRUIT`, so collect those scenarios before treating
+the policy as broad.
+
+`train_bc.py` uses balanced class sampling by default. `dataset.py` also merges
+human correction records from `/wt_ai xingsing label <EXPECTED_OPTION>` into the
+nearest recent decision sample within `correction_window_ticks`.
 
 Release gate before model inference can be treated as production-learned behavior:
 
@@ -180,5 +193,5 @@ Release gate before model inference can be treated as production-learned behavio
 - Add a debug overlay or compact in-world debug readout.
 - Add curated replay fixtures for fetch, warning, and imitation.
 - Add GameTests for carried-item death drop and no-duplication behavior.
-- Implement DAgger relabel merge once model rollouts produce failure states.
+- Collect model-mode rollouts plus human corrections for missing option classes.
 - Consider GRU/ONNX only after the MLP path has real data and scenario metrics.

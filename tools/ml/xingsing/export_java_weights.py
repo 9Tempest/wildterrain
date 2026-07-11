@@ -21,15 +21,18 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", required=True)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--policy-version", default="xingsing_bc_v1")
     args = parser.parse_args()
 
     from model import TinyMlp
 
-    model = TinyMlp.load(Path(args.model))
+    model_path = Path(args.model)
+    model = TinyMlp.load(model_path)
     hidden = int(model.b0.shape[0])
     policy = {
         "schema_version": 1,
         "entity": "wildterrain:xingsing",
+        "policy_version": args.policy_version,
         "obs_spec_version": OBS_SPEC_VERSION,
         "num_actions": len(OPTIONS),
         "layers": [
@@ -43,6 +46,16 @@ def main() -> None:
              "weights": tensor(model.w2), "bias": tensor(model.b2)},
         ],
     }
+    metadata_path = model_path.parent / "metadata.json"
+    if metadata_path.exists():
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        policy["training"] = {
+            "source": metadata.get("source", "jsonl_behavior_cloning"),
+            "examples": metadata.get("examples"),
+            "action_counts": metadata.get("action_counts", {}),
+            "config": metadata.get("config", {}),
+            "options": metadata.get("options", OPTIONS),
+        }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(policy, separators=(",", ":")), encoding="utf-8")

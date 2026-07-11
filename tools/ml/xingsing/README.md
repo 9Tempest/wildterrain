@@ -16,9 +16,10 @@ PYTHONDONTWRITEBYTECODE=1 python3 tools/ml/xingsing/distill_teacher_policy.py \
   --out src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json
 ```
 
-The current committed D0 policy was distilled from 60k synthetic teacher states
-and reached 99.23% held-out teacher-match accuracy. It is a bootstrap model, not
-a replacement for real playtest data.
+The original D0 policy was distilled from 60k synthetic teacher states and reached
+99.23% held-out teacher-match accuracy. The current committed policy is
+`xingsing_real_bc_20260710_v1`, behavior-cloned from 1,200 real Minecraft
+decision records collected in the normal Launcher profile.
 
 Collect real JSONL playtest logs inside Minecraft:
 
@@ -52,7 +53,8 @@ python tools/ml/xingsing/evaluate_policy.py \
 
 python tools/ml/xingsing/export_java_weights.py \
   --model artifacts/policies/xingsing_bc_v1/model.npz \
-  --out src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json
+  --out src/main/resources/data/wildterrain/policies/xingsing_policy_v1.json \
+  --policy-version xingsing_real_bc_YYYYMMDD_v1
 
 python tools/ml/xingsing/validate_export.py \
   --model artifacts/policies/xingsing_bc_v1/model.npz \
@@ -61,3 +63,13 @@ python tools/ml/xingsing/validate_export.py \
 
 Logs are privacy-safe by design: no usernames, no chat, and no raw world seed.
 Do not commit raw logs or generated checkpoints.
+
+Training notes for future agents:
+
+- `train_bc.py` uses balanced class sampling by default so small real datasets
+  do not collapse into only `IDLE_GROOM` and `OBSERVE_PLAYER`.
+- `dataset.py` merges `/wt_ai xingsing label <option>` human corrections into
+  the nearest recent decision sample, within `correction_window_ticks`.
+- Missing classes are still missing data, not a modeling success. Collect more
+  scenario logs before expecting `WARN_HOSTILE`, `FLEE_TO_TREE`, `PLAY_CHASE`,
+  or other uncovered options to generalize.

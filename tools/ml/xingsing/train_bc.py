@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-from dataset import describe, load_examples
+from dataset import class_counts, describe, load_examples
 from features import OBS_DIM, OPTIONS
 
 
@@ -17,6 +17,9 @@ def read_config(path: Path) -> dict[str, float | int]:
         "epochs": 12,
         "batch_size": 128,
         "learning_rate": 0.003,
+        "class_weight_power": 0.25,
+        "balanced_class_sampling": 1,
+        "correction_window_ticks": 80,
         "seed": 7,
     }
     if not path.exists():
@@ -36,7 +39,7 @@ def train(args: argparse.Namespace) -> None:
     from model import TinyMlp, masked_softmax
 
     config = read_config(Path(args.config))
-    examples = load_examples(args.data)
+    examples = load_examples(args.data, correction_window_ticks=int(config["correction_window_ticks"]))
     if not examples:
         raise SystemExit("No Xingsing examples found. Enable /wt_ai xingsing record start and collect JSONL logs first.")
 
@@ -47,15 +50,31 @@ def train(args: argparse.Namespace) -> None:
     model = TinyMlp.init(hidden=int(config["hidden_size"]), seed=int(config["seed"]))
 
     counts = np.bincount(targets, minlength=len(OPTIONS)).astype(np.float32)
-    class_weights = counts.sum() / np.maximum(counts, 1.0)
-    class_weights = class_weights / class_weights.mean()
+    class_weights = np.ones(len(OPTIONS), dtype=np.float32)
+    class_weight_power = float(config["class_weight_power"])
+    present = counts > 0.0
+    if class_weight_power > 0.0 and present.any():
+        class_weights[present] = (counts[present].sum() / counts[present]) ** class_weight_power
+        class_weights[present] = class_weights[present] / class_weights[present].mean()
+        class_weights[~present] = 0.0
+    indices_by_class = [np.flatnonzero(targets == action) for action in range(len(OPTIONS))]
+    present_class_indices = [indices for indices in indices_by_class if len(indices) > 0]
+    samples_per_class = max((len(indices) for indices in present_class_indices), default=len(examples))
+
+    def epoch_order() -> np.ndarray:
+        if int(config["balanced_class_sampling"]) <= 0 or not present_class_indices:
+            return rng.permutation(len(examples))
+        sampled = [
+            rng.choice(indices, size=samples_per_class, replace=len(indices) < samples_per_class)
+            for indices in present_class_indices
+        ]
+        return rng.permutation(np.concatenate(sampled))
 
     batch_size = int(config["batch_size"])
     lr = float(config["learning_rate"])
     for epoch in range(1, int(config["epochs"]) + 1):
-        order = rng.permutation(len(examples))
+        order = epoch_order()
         total_loss = 0.0
-        correct = 0
         for start in range(0, len(order), batch_size):
             index = order[start : start + batch_size]
             x = obs[index]
@@ -66,7 +85,6 @@ def train(args: argparse.Namespace) -> None:
             weights = class_weights[y].reshape(-1, 1)
             loss = -np.log(np.maximum(probs[np.arange(len(y)), y], 1.0e-8)) * class_weights[y]
             total_loss += float(loss.sum())
-            correct += int((probs.argmax(axis=1) == y).sum())
 
             grad_logits = probs
             grad_logits[np.arange(len(y)), y] -= 1.0
@@ -89,15 +107,19 @@ def train(args: argparse.Namespace) -> None:
             model.w0 -= lr * grad_w0.astype(np.float32)
             model.b0 -= lr * grad_b0.astype(np.float32)
 
-        print(f"epoch {epoch:02d} loss={total_loss / len(examples):.4f} acc={correct / len(examples):.3f}")
+        predictions = model.predict(obs, mask)
+        accuracy = float((predictions == targets).mean())
+        print(f"epoch {epoch:02d} loss={total_loss / max(len(order), 1):.4f} acc={accuracy:.3f}")
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     model.save(out / "model.npz")
     (out / "metadata.json").write_text(json.dumps({
+        "source": "jsonl_behavior_cloning",
         "obs_dim": OBS_DIM,
         "num_actions": len(OPTIONS),
         "examples": len(examples),
+        "action_counts": class_counts(examples),
         "options": OPTIONS,
         "config": config,
     }, indent=2), encoding="utf-8")

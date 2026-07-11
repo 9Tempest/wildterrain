@@ -1,5 +1,22 @@
 # Progress
 
+## 2026-07-10
+
+Completed:
+
+- Trained `xingsing_real_bc_20260710_v1`, the first real Minecraft playtest student policy, from 1,200 local Xingsing JSONL decision records.
+- Replaced the runtime policy resource at `data/wildterrain/policies/xingsing_policy_v1.json` with the real-log behavior-cloned MLP.
+- Fixed `train_bc.py` so class balancing is done with balanced sampling instead of letting sparse real datasets collapse into only high-frequency actions.
+- Added human-correction merge support in `dataset.py` so `/wt_ai xingsing label <option>` can relabel the nearest recent decision sample for future DAgger-style passes.
+- Updated the Java export path to embed `policy_version` and training metadata in the policy JSON.
+- Validated the exported Java policy JSON against the NumPy checkpoint with `max_abs_diff=0.00000000`.
+
+Known gaps:
+
+- The 2026-07-10 dataset did not include `WARN_HOSTILE`, `FLEE_TO_TREE`, `PLAY_CHASE`, `APPROACH_PLAYER`, `KEEP_PLAY_DISTANCE`, or `LEAD_TO_FRUIT`, so those options still need targeted real-client collection.
+- The 90.2% accuracy is training-set teacher-match accuracy on one local playtest session, not a held-out generalization claim.
+- More model-mode rollouts plus human corrections are needed before treating Xingsing as a production-learned companion.
+
 ## 2026-07-07
 
 Completed:
@@ -24,7 +41,7 @@ Completed:
 
 Known gaps:
 
-- Xingsing model is trained from synthetic teacher data only; real playtest logs and DAgger corrections are still needed before treating it as a learned player-experience policy.
+- Xingsing now has a first real-log student, but more playtest logs and DAgger corrections are still needed before treating it as a learned player-experience policy.
 - Xingsing needs curated no-duplication/no-loss GameTests around carried items.
 - Mossquill art is improved pipeline art, but still not final Blockbench/Aseprite production art.
 - UI is currently one creature entry; a shared bestiary index will be useful once there are multiple implemented creatures.
