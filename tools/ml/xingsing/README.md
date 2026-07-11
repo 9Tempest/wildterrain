@@ -35,6 +35,33 @@ Collect real JSONL playtest logs inside Minecraft:
 /wt_ai xingsing record stop
 ```
 
+For scalable collection, stand in a safe test world and let the server script
+episodes around you:
+
+```text
+/wt_ai xingsing collect start
+/wt_ai xingsing collect status
+/wt_ai xingsing collect stop
+```
+
+The default command runs coverage episodes in teacher mode. Target one scenario
+with optional episode count, ticks, and mode:
+
+```text
+/wt_ai xingsing collect start fetch_item 40 240 teacher
+/wt_ai xingsing collect start hostile_warning 20 220 model
+```
+
+Automated runs write v2 transition logs under:
+
+```text
+<gameDir>/wildterrain-ai/runs/xingsing/<run-id>/
+```
+
+Each run has `manifest.json` plus `episodes/*.jsonl`. The current dataset loader
+can train from either manual v1 logs or automated v2 runs because both include
+`obs`, `action_mask`, and `teacher_action`.
+
 Behavior-clone real JSONL playtest logs once NumPy is installed:
 
 ```bash
@@ -73,3 +100,5 @@ Training notes for future agents:
 - Missing classes are still missing data, not a modeling success. Collect more
   scenario logs before expecting `WARN_HOSTILE`, `FLEE_TO_TREE`, `PLAY_CHASE`,
   or other uncovered options to generalize.
+- Prefer `/wt_ai xingsing collect start coverage ...` for D2 datasets; keep
+  manual `/record` sessions for spot checks and human corrections.

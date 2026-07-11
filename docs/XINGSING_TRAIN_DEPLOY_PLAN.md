@@ -94,6 +94,10 @@ effectively impossible before selection.
 /wt_ai xingsing record start
 /wt_ai xingsing record status
 /wt_ai xingsing record stop
+/wt_ai xingsing collect start
+/wt_ai xingsing collect start <scenario> <episodes> <ticks> <teacher|model>
+/wt_ai xingsing collect status
+/wt_ai xingsing collect stop
 /wt_ai xingsing label <option>
 /wt_ai xingsing debug on|off
 ```
@@ -108,6 +112,60 @@ In `./gradlew runClient`, `<active Minecraft gameDir>` is usually `run/`.
 In the normal Launcher profile, it is usually the `.minecraft` directory.
 
 Do not commit raw logs, replay files, or generated training checkpoints.
+
+## Automated Real-MC Collection
+
+Manual recording is useful for taste checks, but it does not scale. The D2 path
+is server-side collection driven by Minecraft ticks:
+
+```text
+/wt_ai xingsing collect start
+/wt_ai xingsing collect start coverage 120 240 teacher
+/wt_ai xingsing collect start fetch_item 40 240 teacher
+/wt_ai xingsing collect start hostile_warning 30 220 model
+/wt_ai xingsing collect status
+/wt_ai xingsing collect stop
+```
+
+Current scenarios:
+
+- `coverage`
+- `settle_near_player`
+- `mimic_jump`
+- `mimic_sneak`
+- `mimic_sprint`
+- `fetch_item`
+- `return_item`
+- `hostile_warning`
+- `flee_to_tree`
+- `climb_to_perch`
+- `play_chase`
+
+The collector requires a player to start the run in-world, then scripts stimuli
+server-side. It spawns and cleans up Xingsing, items, hostiles, and temporary
+canopy blocks per episode. This avoids Computer Use and captures real Forge AI,
+navigation, entity, item, and world-state ticks. A future dedicated-server bot
+or Forge `FakePlayer` bridge should replace the human anchor for fully headless
+RL farms.
+
+Automated logs are written to:
+
+```text
+<active Minecraft gameDir>/wildterrain-ai/runs/xingsing/<run-id>/
+```
+
+Each run has:
+
+- `manifest.json`: scenario, mode, episode count, tick budget, vector spec, and
+  privacy-safe player hash.
+- `episodes/*.jsonl`: schema v2 transition records.
+
+Each transition includes `run_id`, `episode_id`, `scenario_id`, `seed`, `step`,
+`episode_tick`, `obs`, `action_mask`, `teacher_action`, `policy_action`,
+`reward`, `done`, `next_obs`, `next_action_mask`, and compact metadata. The
+existing Python loader accepts these files for behavior cloning because
+`teacher_action` remains the default supervised label. RL code should use
+`policy_action`, `reward`, `done`, `next_obs`, and the masks.
 
 ## Manual Real-MC Collection Pass
 
@@ -190,6 +248,10 @@ Release gate before model inference can be treated as production-learned behavio
 
 ## Next Milestones
 
+- Add a dedicated-server bot/FakePlayer bridge so automated collection can run
+  without a human player anchoring the scenario.
+- Add a Python Gym-style wrapper over the v2 transition schema and an online
+  command bridge for RL resets/steps.
 - Add a debug overlay or compact in-world debug readout.
 - Add curated replay fixtures for fetch, warning, and imitation.
 - Add GameTests for carried-item death drop and no-duplication behavior.

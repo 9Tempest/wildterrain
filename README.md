@@ -45,6 +45,7 @@ Full creature briefs live in [docs/CREATURE_DESIGNS.md](docs/CREATURE_DESIGNS.md
 - `python3 tools/generate_mossquill_assets.py` regenerates the current Mossquill pixel textures.
 - `python3 tools/generate_xingsing_assets.py` regenerates the current Xingsing pixel textures.
 - `/wt_ai xingsing scenario fetch_item` and related commands prepare real-client behavior scenarios.
+- `/wt_ai xingsing collect start` runs automated real-Minecraft Xingsing episodes and writes v2 transition logs under `<gameDir>/wildterrain-ai/runs/xingsing`.
 - `/wt_ai xingsing record start` writes local JSONL training logs under `run/wildterrain-ai`; recording is off by default.
 
 Minecraft Java mods cannot load in a truly vanilla client; this project targets your local Forge 1.20.1 install so the final jar can be tested in real Minecraft. Citadel is listed as an optional compatibility dependency because Alex's Mobs and Alex's Caves use it, but this first creature has no hard runtime library dependency beyond Forge.

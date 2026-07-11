@@ -1,12 +1,14 @@
 package dev.lukez.wildterrain.common.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import dev.lukez.wildterrain.WildTerrain;
 import dev.lukez.wildterrain.common.config.WildTerrainConfig;
 import dev.lukez.wildterrain.common.entity.Xingsing;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.PlayerActionMemory;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.XingsingDecisionLogger;
 import dev.lukez.wildterrain.common.entity.ai.xingsing.XingsingOption;
+import dev.lukez.wildterrain.common.entity.ai.xingsing.collect.XingsingCollectionRunner;
 import dev.lukez.wildterrain.core.ModEntities;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -48,6 +50,44 @@ public final class WildTerrainAiCommand {
                                 .then(Commands.literal("start").executes(ctx -> setRecording(ctx.getSource(), true)))
                                 .then(Commands.literal("stop").executes(ctx -> setRecording(ctx.getSource(), false)))
                                 .then(Commands.literal("status").executes(ctx -> recordingStatus(ctx.getSource()))))
+                        .then(Commands.literal("collect")
+                                .then(Commands.literal("start")
+                                        .executes(ctx -> startCollectionDefault(ctx.getSource()))
+                                        .then(Commands.argument("scenario", StringArgumentType.word())
+                                                .suggests((context, builder) -> SharedSuggestionProvider.suggest(
+                                                        XingsingCollectionRunner.scenarioIds(), builder))
+                                                .executes(ctx -> startCollection(ctx.getSource(),
+                                                        StringArgumentType.getString(ctx, "scenario"),
+                                                        24, 240, "teacher"))
+                                                .then(Commands.argument("episodes", IntegerArgumentType.integer(1, 5000))
+                                                        .executes(ctx -> startCollection(ctx.getSource(),
+                                                                StringArgumentType.getString(ctx, "scenario"),
+                                                                IntegerArgumentType.getInteger(ctx, "episodes"),
+                                                                240, "teacher"))
+                                                        .then(Commands.argument("ticks", IntegerArgumentType.integer(60, 6000))
+                                                                .executes(ctx -> startCollection(ctx.getSource(),
+                                                                        StringArgumentType.getString(ctx, "scenario"),
+                                                                        IntegerArgumentType.getInteger(ctx, "episodes"),
+                                                                        IntegerArgumentType.getInteger(ctx, "ticks"),
+                                                                        "teacher"))
+                                                                .then(Commands.argument("mode", StringArgumentType.word())
+                                                                        .suggests((context, builder) ->
+                                                                                SharedSuggestionProvider.suggest(
+                                                                                        new String[]{"teacher", "model"},
+                                                                                        builder))
+                                                                        .executes(ctx -> startCollection(ctx.getSource(),
+                                                                                StringArgumentType.getString(ctx,
+                                                                                        "scenario"),
+                                                                                IntegerArgumentType.getInteger(ctx,
+                                                                                        "episodes"),
+                                                                                IntegerArgumentType.getInteger(ctx,
+                                                                                        "ticks"),
+                                                                                StringArgumentType.getString(ctx,
+                                                                                        "mode"))))))))
+                                .then(Commands.literal("status")
+                                        .executes(ctx -> collectionStatus(ctx.getSource())))
+                                .then(Commands.literal("stop")
+                                        .executes(ctx -> collectionStop(ctx.getSource()))))
                         .then(Commands.literal("debug")
                                 .then(Commands.literal("on").executes(ctx -> setDebug(ctx.getSource(), true)))
                                 .then(Commands.literal("off").executes(ctx -> setDebug(ctx.getSource(), false))))
@@ -103,6 +143,42 @@ public final class WildTerrainAiCommand {
                 + (XingsingDecisionLogger.isRecording() ? "enabled" : "disabled")
                 + ". Session: " + path), false);
         return 1;
+    }
+
+    private static int startCollectionDefault(CommandSourceStack source) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) {
+            source.sendFailure(Component.literal("Run Xingsing collection as a player in-world."));
+            return 0;
+        }
+        return sendCollectionResult(source, XingsingCollectionRunner.startDefault(player));
+    }
+
+    private static int startCollection(CommandSourceStack source, String scenario, int episodes,
+                                       int ticks, String mode) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) {
+            source.sendFailure(Component.literal("Run Xingsing collection as a player in-world."));
+            return 0;
+        }
+        return sendCollectionResult(source, XingsingCollectionRunner.start(player, scenario, episodes, ticks, mode));
+    }
+
+    private static int collectionStatus(CommandSourceStack source) {
+        return sendCollectionResult(source, XingsingCollectionRunner.status());
+    }
+
+    private static int collectionStop(CommandSourceStack source) {
+        return sendCollectionResult(source, XingsingCollectionRunner.stop());
+    }
+
+    private static int sendCollectionResult(CommandSourceStack source, XingsingCollectionRunner.CommandResult result) {
+        if (result.success()) {
+            source.sendSuccess(() -> Component.literal(result.message()), true);
+            return 1;
+        }
+        source.sendFailure(Component.literal(result.message()));
+        return 0;
     }
 
     private static int setDebug(CommandSourceStack source, boolean enabled) {

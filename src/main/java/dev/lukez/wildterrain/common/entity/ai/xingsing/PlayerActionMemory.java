@@ -37,6 +37,18 @@ public final class PlayerActionMemory {
         get(player).lastDropTick = gameTime;
     }
 
+    public static void markJumped(Player player, long gameTime) {
+        get(player).lastJumpTick = gameTime;
+    }
+
+    public static void markSneaking(Player player, long gameTime) {
+        get(player).lastSneakTick = gameTime;
+    }
+
+    public static void markSprinting(Player player, long gameTime) {
+        get(player).lastSprintTick = gameTime;
+    }
+
     public static void markFedXingsing(Player player, long gameTime) {
         get(player).lastFeedTick = gameTime;
     }

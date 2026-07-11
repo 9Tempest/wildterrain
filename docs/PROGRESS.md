@@ -4,6 +4,9 @@
 
 Completed:
 
+- Added `/wt_ai xingsing collect start/status/stop`, a server-side automated real-Minecraft collection runner that scripts Xingsing episodes without Computer Use.
+- Added v2 run manifests and episode transition JSONL under `<gameDir>/wildterrain-ai/runs/xingsing/<run-id>/`, including `next_obs`, action masks, teacher/model actions, rewards, and scenario metadata for later RL work.
+- Added coverage scenarios for settle, mimic jump/sneak/sprint, fetch, return, hostile warning, flee-to-tree, climb-to-perch, and play chase, with temporary world cleanup for spawned mobs/items/canopy blocks.
 - Trained `xingsing_real_bc_20260710_v1`, the first real Minecraft playtest student policy, from 1,200 local Xingsing JSONL decision records.
 - Replaced the runtime policy resource at `data/wildterrain/policies/xingsing_policy_v1.json` with the real-log behavior-cloned MLP.
 - Fixed `train_bc.py` so class balancing is done with balanced sampling instead of letting sparse real datasets collapse into only high-frequency actions.
@@ -13,6 +16,7 @@ Completed:
 
 Known gaps:
 
+- The automated collector still needs a real player as the in-world scenario anchor; the next scaling step is a dedicated-server bot or Forge `FakePlayer` bridge.
 - The 2026-07-10 dataset did not include `WARN_HOSTILE`, `FLEE_TO_TREE`, `PLAY_CHASE`, `APPROACH_PLAYER`, `KEEP_PLAY_DISTANCE`, or `LEAD_TO_FRUIT`, so those options still need targeted real-client collection.
 - The 90.2% accuracy is training-set teacher-match accuracy on one local playtest session, not a held-out generalization claim.
 - More model-mode rollouts plus human corrections are needed before treating Xingsing as a production-learned companion.

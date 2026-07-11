@@ -124,8 +124,8 @@ public final class XingsingObservationBuilder {
         builder.nearestPlayerUuid = player.getUUID();
         builder.nearestPlayerVisible = visible;
         builder.nearestPlayerDistanceNorm = distance;
-        builder.nearestPlayerSneaking = player.isShiftKeyDown();
-        builder.nearestPlayerSprinting = player.isSprinting();
+        builder.nearestPlayerSneaking = player.isShiftKeyDown() || memory.sneakAgeNorm(now) < 0.35F;
+        builder.nearestPlayerSprinting = player.isSprinting() || memory.sprintAgeNorm(now) < 0.35F;
         builder.nearestPlayerJumpedRecently = memory.jumpAgeNorm(now) < 0.35F;
         builder.nearestPlayerDroppedItemRecently = memory.dropAgeNorm(now) < 0.45F;
         builder.nearestPlayerHoldingFood = Xingsing.isFavoriteFood(player.getMainHandItem())
